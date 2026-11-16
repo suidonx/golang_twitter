@@ -3,6 +3,8 @@ FROM golang:alpine AS development
 
 RUN go install github.com/air-verse/air@latest
 
+RUN go install github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+
 WORKDIR /app
 
 COPY go.mod go.sum ./
@@ -11,7 +13,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o main .
+RUN go build -o main ./cmd/server
 
 CMD [ "air", "-c", ".air.toml" ]
 
