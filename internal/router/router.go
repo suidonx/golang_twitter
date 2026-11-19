@@ -5,10 +5,11 @@ import (
 	"github.com/suidonx/golang_twitter/internal/controller"
 )
 
-func Setup() *gin.Engine {
+func Setup(ac *controller.AuthController) *gin.Engine {
 	router := gin.Default()
 
 	router.GET("/health_check", controller.HealthCheck)
+	router.POST("/signup", ac.SignUp)
 
 	return router
 }

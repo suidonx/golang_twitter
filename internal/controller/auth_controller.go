@@ -12,15 +12,28 @@ type SignUpRequest struct {
 	Password string `json:"password" binding:"required,password"`
 }
 
-func SignUp(c *gin.Context) {
+type AuthController struct {
+	authService *service.AuthService
+}
+
+func NewAuthController(a *service.AuthService) *AuthController {
+	return &AuthController{authService: a}
+}
+
+func (ac *AuthController) SignUp(c *gin.Context) {
 	var req SignUpRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	service.SignUp(req.Email, req.Password)
-	c.JSON(http.StatusCreated, gin.H{"status": "OK"})
 
+	err := ac.authService.SignUp(c.Request.Context(), req.Email, req.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"status": "OK"})
+	return
 }
 
 func Login(c *gin.Context) {}
