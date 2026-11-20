@@ -31,5 +31,12 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+    volumes:
+      - ./mailpit-data:/data
 volumes:
   postgres_data:
