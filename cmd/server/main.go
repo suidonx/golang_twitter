@@ -44,7 +44,7 @@ func main() {
 	defer db.Close()
 
 	queries := repository.New(db)
-	authService := service.NewAuthService(queries)
+	authService := service.NewAuthService(queries, db)
 	authController := controller.NewAuthController(authService)
 	r := router.Setup(authController)
 

@@ -37,6 +37,7 @@ services:
       - "1025:1025"
       - "8025:8025"
     volumes:
-      - ./mailpit-data:/data
+      - mailpit_data:/data
 volumes:
   postgres_data:
+  mailpit_data:

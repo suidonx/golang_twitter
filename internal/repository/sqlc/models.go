@@ -5,15 +5,26 @@
 package repository
 
 import (
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
 )
 
 type User struct {
-	ID           uuid.UUID
-	Email        string
-	PasswordHash string
-	CreatedAt    time.Time
-	UpdatedAt    time.Time
+	ID              uuid.UUID
+	Email           string
+	PasswordHash    string
+	EmailVerifiedAt sql.NullTime
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+}
+
+type UserActivation struct {
+	ID        uuid.UUID
+	UserID    uuid.UUID
+	TokenHash string
+	ExpiresAt time.Time
+	UsedAt    sql.NullTime
+	CreatedAt time.Time
 }

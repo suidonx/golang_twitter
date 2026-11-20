@@ -7,10 +7,30 @@ package repository
 
 import (
 	"context"
+	"time"
+
+	"github.com/google/uuid"
 )
 
+const createToken = `-- name: CreateToken :exec
+
+INSERT INTO user_activations (user_id, token_hash, expires_at) VALUES ($1, $2, $3)
+`
+
+type CreateTokenParams struct {
+	UserID    uuid.UUID
+	TokenHash string
+	ExpiresAt time.Time
+}
+
+// user_id が欲しいため
+func (q *Queries) CreateToken(ctx context.Context, arg CreateTokenParams) error {
+	_, err := q.db.ExecContext(ctx, createToken, arg.UserID, arg.TokenHash, arg.ExpiresAt)
+	return err
+}
+
 const createUser = `-- name: CreateUser :one
-INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id, email, password_hash, created_at, updated_at
+INSERT INTO users (email, password_hash) VALUES ($1, $2) RETURNING id
 `
 
 type CreateUserParams struct {
@@ -18,15 +38,9 @@ type CreateUserParams struct {
 	PasswordHash string
 }
 
-func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, error) {
+func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (uuid.UUID, error) {
 	row := q.db.QueryRowContext(ctx, createUser, arg.Email, arg.PasswordHash)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Email,
-		&i.PasswordHash,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-	)
-	return i, err
+	var id uuid.UUID
+	err := row.Scan(&id)
+	return id, err
 }
