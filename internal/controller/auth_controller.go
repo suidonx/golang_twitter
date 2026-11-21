@@ -36,6 +36,21 @@ func (ac *AuthController) SignUp(c *gin.Context) {
 	return
 }
 
+func (ac *AuthController) Activate(c *gin.Context) {
+	token := c.Query("token")
+	if token == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "認証トークンが設定されていません"})
+		return
+	}
+
+	err := ac.authService.Activate(c.Request.Context(), token)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "mail activasion successed"})
+}
+
 func Login(c *gin.Context) {}
 
 // 物理削除

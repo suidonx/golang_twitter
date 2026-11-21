@@ -10,6 +10,7 @@ func Setup(ac *controller.AuthController) *gin.Engine {
 
 	router.GET("/health_check", controller.HealthCheck)
 	router.POST("/signup", ac.SignUp)
+	router.GET("/activate", ac.Activate)
 
 	return router
 }

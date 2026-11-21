@@ -25,6 +25,5 @@ type UserActivation struct {
 	UserID    uuid.UUID
 	TokenHash string
 	ExpiresAt time.Time
-	UsedAt    sql.NullTime
 	CreatedAt time.Time
 }

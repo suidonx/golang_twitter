@@ -44,3 +44,33 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (uuid.UU
 	err := row.Scan(&id)
 	return id, err
 }
+
+const findEmailActivationByTokenHash = `-- name: FindEmailActivationByTokenHash :one
+SELECT user_id, token_hash, expires_at
+FROM user_activations
+WHERE token_hash = $1
+`
+
+type FindEmailActivationByTokenHashRow struct {
+	UserID    uuid.UUID
+	TokenHash string
+	ExpiresAt time.Time
+}
+
+func (q *Queries) FindEmailActivationByTokenHash(ctx context.Context, tokenHash string) (FindEmailActivationByTokenHashRow, error) {
+	row := q.db.QueryRowContext(ctx, findEmailActivationByTokenHash, tokenHash)
+	var i FindEmailActivationByTokenHashRow
+	err := row.Scan(&i.UserID, &i.TokenHash, &i.ExpiresAt)
+	return i, err
+}
+
+const markEmailAsVerified = `-- name: MarkEmailAsVerified :exec
+UPDATE users
+SET email_verified_at = NOW()
+WHERE id = $1
+`
+
+func (q *Queries) MarkEmailAsVerified(ctx context.Context, id uuid.UUID) error {
+	_, err := q.db.ExecContext(ctx, markEmailAsVerified, id)
+	return err
+}
