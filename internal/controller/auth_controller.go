@@ -3,6 +3,7 @@ package controller
 import (
 	"net/http"
 
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/suidonx/golang_twitter/internal/service"
 )
@@ -51,7 +52,34 @@ func (ac *AuthController) Activate(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "mail activasion successed"})
 }
 
-func Login(c *gin.Context) {}
+type LoginRequest struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required"`
+}
+
+func (ac *AuthController) Login(c *gin.Context) {
+	var req LoginRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	session := sessions.Default(c)
+
+	userID, err := ac.authService.Login(c.Request.Context(), req.Email, req.Password)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"message": "メールアドレスまたはパスワードが正しくありません"})
+		return
+	}
+
+	session.Set("user_id", userID.String())
+	if err := session.Save(); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "セッションの保存に失敗しました",
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "ログインに成功しました"})
+}
 
 // 物理削除
 func DeleteAccount(c *gin.Context) {}

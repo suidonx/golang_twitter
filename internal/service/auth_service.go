@@ -12,6 +12,7 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/google/uuid"
 	repository "github.com/suidonx/golang_twitter/internal/repository/sqlc"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -148,7 +149,23 @@ Twitter Clone`, activationURL)
 	return nil
 }
 
-func Login() {}
+func (s *AuthService) Login(ctx context.Context, email, password string) (uuid.UUID, error) {
+	user, err := s.queries.GetUserByEmail(ctx, email)
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password))
+	if err != nil {
+		return uuid.Nil, err
+	}
+
+	if !user.EmailVerifiedAt.Valid {
+		return uuid.Nil, errors.New("メール認証が完了していません")
+	}
+
+	return user.ID, nil
+}
 
 // 物理削除
 func DeleteAccount() {}

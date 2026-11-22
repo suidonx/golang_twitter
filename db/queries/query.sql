@@ -13,3 +13,8 @@ WHERE token_hash = $1;
 UPDATE users
 SET email_verified_at = NOW()
 WHERE id = $1;
+
+-- name: GetUserByEmail :one
+SELECT id, password_hash, email_verified_at
+FROM users
+WHERE email = $1;

@@ -7,6 +7,7 @@ package repository
 
 import (
 	"context"
+	"database/sql"
 	"time"
 
 	"github.com/google/uuid"
@@ -61,6 +62,25 @@ func (q *Queries) FindEmailActivationByTokenHash(ctx context.Context, tokenHash 
 	row := q.db.QueryRowContext(ctx, findEmailActivationByTokenHash, tokenHash)
 	var i FindEmailActivationByTokenHashRow
 	err := row.Scan(&i.UserID, &i.TokenHash, &i.ExpiresAt)
+	return i, err
+}
+
+const getUserByEmail = `-- name: GetUserByEmail :one
+SELECT id, password_hash, email_verified_at
+FROM users
+WHERE email = $1
+`
+
+type GetUserByEmailRow struct {
+	ID              uuid.UUID
+	PasswordHash    string
+	EmailVerifiedAt sql.NullTime
+}
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
+	var i GetUserByEmailRow
+	err := row.Scan(&i.ID, &i.PasswordHash, &i.EmailVerifiedAt)
 	return i, err
 }
 

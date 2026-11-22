@@ -38,6 +38,12 @@ services:
       - "8025:8025"
     volumes:
       - mailpit_data:/data
+  redis:
+    image: redis:8.10.3-alpine
+    volumes:
+      - redis-data:/data
+
 volumes:
   postgres_data:
   mailpit_data:
+  redis-data:
