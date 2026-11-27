@@ -14,3 +14,11 @@ CREATE TABLE user_activations(
   expires_at timestamptz NOT NULL,
   created_at timestamptz NOT NULL DEFAULT now()
 );
+
+CREATE TABLE posts (
+  id         uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  content    text NOT NULL CHECK (char_length(content) <= 140),
+  user_id    uuid NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);

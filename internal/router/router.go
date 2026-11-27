@@ -10,7 +10,7 @@ import (
 	"github.com/suidonx/golang_twitter/internal/controller"
 )
 
-func Setup(ac *controller.AuthController) *gin.Engine {
+func Setup(ac *controller.AuthController, tc *controller.TweetController) *gin.Engine {
 	router := gin.Default()
 
 	sessionSecret := os.Getenv("SESSION_SECRET")
@@ -33,6 +33,7 @@ func Setup(ac *controller.AuthController) *gin.Engine {
 	router.POST("/signup", ac.SignUp)
 	router.GET("/activate", ac.Activate)
 	router.POST("/login", ac.Login)
+	router.POST("/post", tc.POST)
 
 	return router
 }
