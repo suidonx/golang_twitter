@@ -13,6 +13,20 @@ import (
 	"github.com/google/uuid"
 )
 
+const createPost = `-- name: CreatePost :exec
+INSERT INTO posts (content, user_id) VALUES ($1, $2)
+`
+
+type CreatePostParams struct {
+	Content string
+	UserID  uuid.UUID
+}
+
+func (q *Queries) CreatePost(ctx context.Context, arg CreatePostParams) error {
+	_, err := q.db.ExecContext(ctx, createPost, arg.Content, arg.UserID)
+	return err
+}
+
 const createToken = `-- name: CreateToken :exec
 
 INSERT INTO user_activations (user_id, token_hash, expires_at) VALUES ($1, $2, $3)

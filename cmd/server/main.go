@@ -46,7 +46,9 @@ func main() {
 	queries := repository.New(db)
 	authService := service.NewAuthService(queries, db)
 	authController := controller.NewAuthController(authService)
-	r := router.Setup(authController)
+	tweetService := service.NewTweetService(queries, db)
+	tweetController := controller.NewTweetController(tweetService)
+	r := router.Setup(authController, tweetController)
 
 	r.Run(":8080")
 }

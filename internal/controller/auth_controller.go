@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/gin-contrib/sessions"
@@ -30,7 +31,8 @@ func (ac *AuthController) SignUp(c *gin.Context) {
 
 	err := ac.authService.SignUp(c.Request.Context(), req.Email, req.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		slog.Error("ユーザー登録に失敗", "err", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "internal server error"})
 		return
 	}
 	c.JSON(http.StatusCreated, gin.H{"status": "OK"})
@@ -71,8 +73,9 @@ func (ac *AuthController) Login(c *gin.Context) {
 		return
 	}
 
-	session.Set("user_id", userID.String())
+	session.Set("user_id", userID)
 	if err := session.Save(); err != nil {
+		slog.Error("セッションの保存に失敗", "err", err)
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"message": "セッションの保存に失敗しました",
 		})
